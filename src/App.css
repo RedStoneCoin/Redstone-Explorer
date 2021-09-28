@@ -1,7 +1,10 @@
 .App {
   text-align: center;
 }
+.center {
+  text-align: center;
 
+}
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -12,6 +15,8 @@
     animation: App-logo-spin infinite 20s linear;
   }
 }
+
+
 
 .App-header {
   background-color: #282c34;
@@ -95,6 +100,11 @@ h1.title {
   width: 100%;
 }
 
+.center {
+  border: 5px solid #e0e0e0;
+  display: flex;
+  justify-content: center;
+  }
 table.table th {
   color: #96999e;
 }

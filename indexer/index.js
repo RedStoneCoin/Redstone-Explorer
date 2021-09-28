@@ -134,7 +134,7 @@ const start = async function() {
                     console.log(array[0]);
                     res.json(array[0]);
                 } else {
-                    fetch(`http://127.0.0.1:8000/api/v1/blocks/${req.params.hash}`)
+                    fetch(`http://127.0.0.1:8000/json_api/get_blk/${req.params.hash}`)
                         .then(function(response) {
                             return response.json();
                         })

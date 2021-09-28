@@ -28,7 +28,19 @@ function getacc(acc) {
       show1(myJson);
     });
     
-  }
+}
+function getblkhash(acc) {
+  fetch('http://0.0.0.0:1234/get_acc/' + acc)
+  .then(function(response) {
+    console.log(response);
+    return response.json();
+  })
+  .then(function(myJson) {
+    console.log(myJson);
+    show1(myJson);
+  });
+  
+}
 
 function search() {
  
@@ -55,7 +67,7 @@ function show(data) {
   for (let r of data) {
         tab += `
         <tr> 
-          <td>${r.hash} </td>
+          <td> <a href="?blk=${r.hash}"> ${r.hash}</a> </td>
           <td>${r.header.height}</td>
           <td>${r.header.chain}</td> 
         </tr>`;
@@ -91,26 +103,45 @@ function App() {
     const params = new URLSearchParams(windowUrl);
     let main = params.get("id");
     let accpar = params.get("acc");
+    let blk = params.get("blk");
 
     console.log(main);
 
 
     if (accpar != null) { 
-        
         let getac = getacc(accpar);
         console.log(getac);
         return (
             <div className="App">
-                  <h1>Redstone Network Accounts</h1>
-                  <p>Account: {accpar} </p>
+                  <h1>Redstone Network Account: {accpar}</h1>
+ 
+                <a href="/">Go back</a>
+
+                <div class="center">
                   <table class="table1" id="acc">
                         Coult not find  {accpar}?
                         Please try again!
                 </table>
+                </div>
             </div>
         );
-        
     }   
+    if (blk != null) { 
+      let getac = getacc(blk);
+      console.log(blk);
+      return (
+          <div className="App">
+                <h1>Redstone Network Block: {blk}</h1>
+                <a href="/">Go back</a>
+                <div class="center">
+                <table class="table1" id="blk">
+                      Coult not find  {accpar}?
+                      Please try again!
+                </table>
+                </div>
+          </div>
+      );
+  }   
 
     if (main == null) {
     getblk(1);
