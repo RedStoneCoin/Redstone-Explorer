@@ -27,29 +27,75 @@ function getacc(acc) {
       console.log(myJson);
       show1(myJson);
     });
-    
 }
-function getblkhash(acc) {
-  fetch('http://0.0.0.0:1234/get_acc/' + acc)
+function gettx(tx) {
+  fetch('http://0.0.0.0:1234/tx/' + tx)
   .then(function(response) {
     console.log(response);
     return response.json();
   })
   .then(function(myJson) {
     console.log(myJson);
-    show1(myJson);
+    show2(myJson);
   });
-  
 }
 
-function search() {
- 
-   // if (urlp["account"] =! "") {
+function getblkhash(acc) {
+  fetch('http://0.0.0.0:1234/block/' + acc)
+  .then(function(response) {
+    console.log(response);
+    return response.json();
+  })
+  .then(function(myJson) {
+    console.log(myJson);
+    show3(myJson);
+  });
+}
+function show3(data) {
+  let tab = 
+  `<tr>
+  <th>Hash</th>
+  <th>Heigt</th>
+  <th>Chain</th>
+  <th>Parent hash</th>
+  <th>Uncle root</th>
+  </tr>
+`;
+
+      tab +=`
+        <tr> 
+          <td>${data.hash} </td>
+          <td>${data.header.height}</td>
+          <td>${data.header.chain}</td> 
+          <td>${data.header.parent_hash}</td> 
+          <td>${data.header.uncle_root}</td>  
+        </tr>`;
+  let tab_tx =
+  `<tr>
+    <th>From</th>
+    <th>Amount</th>
+    <th>To</th>
+    <th>Hash</th>
+  </tr>
+  `;
+  for (let r of data.transactions) {
+    tab_tx += `
+      <tr>
+        <td>${r.sender}</td>
+        <td>${r.amount}</td>
+        <td>${r.reciver}</td>
+        <td> <a href="?tx=${r.hash}"> ${r.hash}</a> </td>
+      </tr>
+    `;
+  }
+  
+  // Setting innerHTML as tab variable
+  document.getElementById("blk").innerHTML = tab;
+  document.getElementById("blk_tx").innerHTML = tab_tx;
 
 
-   // } else {
-   //     getblk(1);
-   // }
+
+
 
 }
 
@@ -96,14 +142,45 @@ function show1(data) {
     // Setting innerHTML as tab variable
     document.getElementById("acc").innerHTML = tab;
   
-  }
+}
+function show2(data) {
+  let tab = 
+  `<tr>
+  <th>From</th>
+  <th>Amount</th>
+  <th>To</th>
+  <th>Hash</th>
+  </tr>
+`;
 
+      tab +=`
+        <tr> 
+          <td>${data.sender} </td>
+          <td>${data.amount}</td>
+          <td>${data.reciver}</td> 
+          <td>${data.hash}</td> 
+
+        </tr>`;
+  
+  // Setting innerHTML as tab variable
+  document.getElementById("tx").innerHTML = tab;
+
+}
+function search() {
+  // get option of what_to_search
+  let op = document.getElementById("what_to_search").option;
+  // get value of search_thing
+  let input = document.getElementById("search_thing").value;
+  // opens link wiht option and input
+  window.location.href = "/?" + op +  "=" + input;
+}
 function App() {
     const windowUrl = window.location.search;
     const params = new URLSearchParams(windowUrl);
     let main = params.get("id");
     let accpar = params.get("acc");
     let blk = params.get("blk");
+    let tx = params.get("tx");
 
     console.log(main);
 
@@ -126,12 +203,28 @@ function App() {
             </div>
         );
     }   
+    if (tx != null) {
+      let gettx1 = gettx(tx);
+      console.log(gettx);
+        return (
+            <div className="App">
+                  <h1>Redstone Network Transaction: {tx}</h1>
+                  <a href="/">Go back</a>
+                  <div class="center">
+                    <table class="table1" id="tx">
+                            Coult not find  {tx}?
+                            Please try again!
+                    </table>
+                  </div>
+            </div>
+        );
+    }
     if (blk != null) { 
-      let getac = getacc(blk);
+      getblkhash(blk);
       console.log(blk);
       return (
           <div className="App">
-                <h1>Redstone Network Block: {blk}</h1>
+                <h1>Redstone Network Block Hash: {blk}</h1>
                 <a href="/">Go back</a>
                 <div class="center">
                 <table class="table1" id="blk">
@@ -139,17 +232,30 @@ function App() {
                       Please try again!
                 </table>
                 </div>
+                <h1>Transactions</h1>
+                <table class="table1" id="blk_tx">
+                      Coult not find  {accpar}?
+                      Please try again!
+                </table>
           </div>
       );
   }   
 
     if (main == null) {
     getblk(1);
+
+
     return (
     <div className="App">
-          <h1>Redstone Network</h1>
-          <p>
-          </p>
+      <div class="topnav">
+        <a href="#about">Redstone Network Explorer</a>
+        <div class="search-container">
+          <form onsubmit="search()">
+              <input type="text" id="search_thing" placeholder="Search block hash" name="blk"/>
+              <button onclick="search()">Search</button>          </form>
+        </div>
+      </div>
+      
         <section class="section">
         <div class="container">
             <div class="columns">
