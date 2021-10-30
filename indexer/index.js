@@ -8,8 +8,8 @@ const start = async function() {
     var app = express(); // launch the API app
     app.use(cors()) // open the API to everyone
     var tot_json = `[`
-    app.listen(1234, () => {
-        console.log("API running on port 1234");
+    app.listen(1235, () => {
+        console.log("API running on port 1235");
     });
     app.get("/create_wallet", (req, res, next) => { // gets the number of chains/
         fetch(`http://127.0.0.1:8000/json_api/create_wallet`)
