@@ -174,6 +174,21 @@ const start = async function() {
                 };
             });
         })
+        app.get("/acc_history_rec/:account", (req, res, next) => {            
+            let transactions_cursor = dbo.collection("transactions").find({ reciver: req.params.account });
+            transactions_cursor.toArray().then(array => {
+                console.log(array);
+                res.json(array);
+            })
+        });
+        app.get("/acc_history_sender/:account", (req, res, next) => {
+            let transactions_cursor = dbo.collection("transactions").find({ sender: req.params.account });
+            transactions_cursor.toArray().then(array => {
+                console.log(array);
+                res.json(array);
+            })
+        });
+
         client.on('data', function(data) { // when we recieve data from the RPC
             console.log('Received: ' + data);
             if (!init) { // is this the first message recieved?
@@ -192,12 +207,27 @@ const start = async function() {
                     // get block transactions in to array
                     //var txs = block['transactions']
                     for (var i = 0; i < block['transactions'].length; i++) {
-                        console.log(block['transactions'][i]['hash'])
                         var tx = block['transactions'][i];
-                        dbo.collection("transactions").insertOne(tx, function(err, res) {
-                            if (err) throw err;
-                            console.log(`1 tx with hash=${tx['hash']} inserted`);
-                        });
+                        if (block['transactions'][i]['sender'] != "coinbase") {
+                            let addr = block['transactions'][i]['sender']
+                            fetch(`http://127.0.0.1:8000/json_api/pk_to_acc/${addr}`)
+                            .then(function(response) {
+                                return response.json();
+                            })
+                            .then(function(myJson) {
+                                if (myJson != null) {
+                                    let send_addr = myJson['address']
+                                    tx.sender = send_addr;
+                                    console.log(tx)
+                                    dbo.collection("transactions").insertOne(tx, function(err, res) {
+                                        if (err) throw err;
+                                        console.log(`1 tx with hash=${tx['hash']} inserted`);
+                                    });
+                                } else {
+                                    console.log("Failed to get address from node")
+                                }
+                            })
+                        } 
                     }
                     if (block.block_type = "Send") {
                         let new_json = `{hash:${block.hash}, time: ${block.header.timestamp}, public_key: ${block.header.chain_key}, links: [ {hash: ${block.header.prev_hash}, type: 0 } ] },`

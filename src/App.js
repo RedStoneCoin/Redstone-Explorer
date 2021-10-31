@@ -81,9 +81,9 @@ function show3(data) {
   for (let r of data.transactions) {
     tab_tx += `
       <tr>
-        <td>${r.sender}</td>
-        <td>${r.amount}</td>
-        <td>${r.reciver}</td>
+      <td> <a href="?acc=${r.sender}"> ${r.sender}</a> </td>
+      <td>${r.amount}</td>
+        <td> <a href="?acc=${r.reciver}"> ${r.reciver}</a> </td>
         <td> <a href="?tx=${r.hash}"> ${r.hash}</a> </td>
       </tr>
     `;
@@ -131,15 +131,53 @@ function show1(data) {
     <th>Smart contract</th>
     </tr>
 `;
-
+let tab1 = 
+`<tr>
+<th>From</th>
+<th>Amount</th>
+<th>To</th>
+</tr>
+`;
         tab +=`
           <tr> 
             <td>${data.Result.address} </td>
             <td>${data.Result.balance}</td>
             <td>${data.Result.smart_contract}</td> 
           </tr>`;
-    
-    // Setting innerHTML as tab variable
+          fetch('http://127.0.0.1:1234/acc_history_rec/' + data.Result.address) 
+          .then(function(response) {
+            console.log(response);
+            return response.json();
+          })
+          .then(function(myJson) {
+            console.log(myJson);
+            for (let r of myJson) {
+              tab1 += `
+                <tr>
+                <td> <a href="?acc=${r.sender}"> ${r.sender}</a> </td>
+                <td>${r.amount}</td>
+                  <td> <a href="?acc=${r.reciver}"> ${r.reciver}</a> </td>
+                </tr>
+              `;
+            }
+          })
+          fetch('http://127.0.0.1:1234/acc_history_sender/' + data.Result.address) 
+          .then(function(response) {
+            console.log(response);
+            return response.json();
+          })
+          .then(function(myJson) {
+            console.log(myJson);
+            for (let r of myJson) {
+              tab1 += `
+                <tr>
+                <td> <a href="?acc=${r.sender}"> ${r.sender}</a> </td>
+                <td>${r.amount}</td>
+                  <td> <a href="?acc=${r.reciver}"> ${r.reciver}</a> </td>
+                </tr>
+              `;
+            }
+          })
     document.getElementById("acc").innerHTML = tab;
   
 }
@@ -155,9 +193,9 @@ function show2(data) {
 
       tab +=`
         <tr> 
-          <td>${data.sender} </td>
-          <td>${data.amount}</td>
-          <td>${data.reciver}</td> 
+        <td> <a href="?acc=${data.sender}"> ${data.sender}</a> </td>
+        <td>${data.amount}</td>
+          <td> <a href="?acc=${data.reciver}"> ${data.reciver}</a> </td>
           <td>${data.hash}</td> 
 
         </tr>`;
